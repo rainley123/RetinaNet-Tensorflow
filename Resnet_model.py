@@ -3,8 +3,6 @@ import numpy as np
 import tensorflow.contrib.slim as slim
 from utils.layer_utils import resnet101_body, resnet101_head
 from utils.common_utils import assign_targets_oneimg, augmentation, decode, nms, eval_OneImg
-from utils.resnet101 import inference
-from utils.darknet_53 import darknet53_body
 
 IMAGE_SHAPE = [224, 224]
 
@@ -66,39 +64,7 @@ class resnet101(object):
                             weights_regularizer=slim.l2_regularizer(0.0001),
                             biases_initializer=tf.zeros_initializer()):                          
                         feature_maps, class_pred, box_pred = resnet101_head(layer1, layer2, layer3, self.class_num, self.anchors_num)
-            
-        '''
-        method2: Pre-trained darknet-53
-        '''
-        # # set batch norm params
-        # batch_norm_params = {
-        #     'decay': self.batch_norm_decay,
-        #     'epsilon': 1e-05,
-        #     'scale': True,
-        #     'is_training': is_training,
-        #     'fused': None,  # Use fused batch norm if possible.
-        # }
-
-        # with slim.arg_scope([slim.conv2d, slim.batch_norm], reuse=reuse):
-        #     with slim.arg_scope([slim.conv2d], 
-        #                         normalizer_fn=slim.batch_norm,
-        #                         normalizer_params=batch_norm_params,
-        #                         biases_initializer=None,
-        #                         activation_fn=lambda x: tf.nn.leaky_relu(x, alpha=0.1)):
-        #         with tf.variable_scope('darknet53_body'):
-        #             route_1, route_2, route_3 = darknet53_body(inputs)
-
-        #         with tf.variable_scope('RetinaNet_head'):
-        #             with slim.arg_scope([slim.conv2d], 
-        #                     normalizer_fn=slim.batch_norm,
-        #                     normalizer_params=batch_norm_params,                        
-        #                     activation_fn=None,
-        #                     weights_initializer=tf.random_normal_initializer(stddev=0.01),
-        #                     weights_regularizer=slim.l2_regularizer(0.0001),
-        #                     biases_initializer=tf.zeros_initializer()):
-
-        #                     feature_maps, class_pred, box_pred = resnet101_head(route_1, route_2, route_3, self.class_num, self.anchors_num)
-      
+               
         return feature_maps, class_pred, box_pred
         
     def generate_anchors(self, feature_maps):
